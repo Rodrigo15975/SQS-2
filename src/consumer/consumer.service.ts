@@ -14,14 +14,14 @@ export class ConsumerService {
     return 'This action adds a new consumer'
   }
 
-  @SqsMessageHandler(/** name: */ 'myConsumer1', /** batch: */ false)
+  @SqsMessageHandler(/** name: */ 'mi-cola-prueba', /** batch: */ false)
   public handleMessage(message: Message) {
     console.log(message)
     return
   }
 
   @SqsConsumerEventHandler(
-    /** name: */ 'myConsumer1',
+    /** name: */ 'mi-cola-prueba',
     /** eventName: */ 'processing_error',
   )
   public onProcessingError(error: Error, message: Message) {
