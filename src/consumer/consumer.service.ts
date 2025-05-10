@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common'
 import { CreateConsumerDto } from './dto/create-consumer.dto'
 import { UpdateConsumerDto } from './dto/update-consumer.dto'
 import { SqsConsumerEventHandler, SqsMessageHandler } from '@ssut/nestjs-sqs'
+import { Message } from '@aws-sdk/client-sqs'
+
 @Injectable()
 export class ConsumerService {
   create(createConsumerDto: CreateConsumerDto) {
@@ -12,17 +14,23 @@ export class ConsumerService {
     return 'This action adds a new consumer'
   }
 
-  @SqsMessageHandler('mi-cola-prueba', false) // false = no batch
-  async handleMessage(message: AWS.SQS.Message) {
-    const body = JSON.parse(message.Body!)
-    console.log('📥 Mensaje recibido desde SQS:', body)
-
-    // Aquí procesas tu lógica
+  @SqsMessageHandler(/** name: */ 'myConsumer1', /** batch: */ false)
+  public handleMessage(message: Message) {
+    console.log(message)
+    return
   }
 
-  @SqsConsumerEventHandler('mi-cola-prueba', 'error')
-  onError(error: Error) {
-    console.error('⛔ Error al procesar mensaje SQS:', error)
+  @SqsConsumerEventHandler(
+    /** name: */ 'myConsumer1',
+    /** eventName: */ 'processing_error',
+  )
+  public onProcessingError(error: Error, message: Message) {
+    console.log({
+      error,
+      message,
+    })
+
+    // report errors here
   }
 
   findAll() {
